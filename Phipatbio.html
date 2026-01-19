@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="th" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบจัดการห้องเรียนวิทยาศาสตร์ชีววิทยา</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Kanit', sans-serif; box-sizing: border-box; }
+    .gradient-bg { background: linear-gradient(135deg, #0d5c2e 0%, #1a8f4a 50%, #2eb872 100%); }
+    .modal-backdrop { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-5px); shadow: 0 10px 25px rgba(0,0,0,0.1); }
+  </style>
+ </head>
+ <body class="h-full bg-gray-50">
+  <div id="app" class="min-h-full flex flex-col">
+   
+   <header class="gradient-bg text-white py-10 px-4 shadow-lg">
+    <div class="max-w-5xl mx-auto text-center">
+     <h1 class="text-4xl md:text-5xl font-bold mb-2">🌿 วิทยาศาสตร์ชีววิทยา</h1>
+     <p class="text-green-50 text-xl opacity-90">ระบบจัดการเรียนการสอนและติดตามภาระงาน</p>
+    </div>
+   </header>
+
+   <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-12">
+    <div class="grid md:grid-cols-2 gap-8 mb-12">
+     <button onclick="openModal('attendance')" class="card-hover bg-white p-8 rounded-3xl border-2 border-emerald-100 shadow-sm flex items-center gap-6 group text-left">
+      <div class="w-20 h-20 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">เช็คชื่อเข้าเรียน</h2>
+        <p class="text-gray-600">บันทึกการมาเรียนแยกตามห้องและเลขที่</p>
+      </div>
+     </button>
+
+     <button onclick="openModal('assignment')" class="card-hover bg-white p-8 rounded-3xl border-2 border-blue-100 shadow-sm flex items-center gap-6 group text-left">
+      <div class="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">ส่งงาน / ภาระงาน</h2>
+        <p class="text-gray-600">แนบรูปภาพผลงานและระบุชื่องาน</p>
+      </div>
+     </button>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
+      <div class="p-6 border-b border-gray-100 bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
+        <h3 class="text-2xl font-bold text-gray-900 flex items-center gap-2">📊 สรุปรายงานหลังบ้าน</h3>
+        <div class="flex gap-2">
+          <select id="filter-room" onchange="renderRecords()" class="px-4 py-2 rounded-xl border border-gray-300 text-sm font-bold outline-none focus:ring-2 focus:ring-green-500">
+            <option value="all">ทุกห้องเรียน</option>
+            <option value="5/1">ม.5/1</option>
+            <option value="5/2">ม.5/2</option>
+            <option value="5/3">ม.5/3</option>
+            <option value="5/7">ม.5/7</option>
+          </select>
+          <select id="filter-type" onchange="renderRecords()" class="px-4 py-2 rounded-xl border border-gray-300 text-sm font-bold outline-none focus:ring-2 focus:ring-green-500">
+            <option value="all">ทุกรายการ</option>
+            <option value="attendance">เฉพาะเช็คชื่อ</option>
+            <option value="assignment">เฉพาะส่งงาน</option>
+          </select>
+        </div>
+      </div>
+      <div id="records-container" class="p-0">
+        </div>
+    </div>
+   </main>
+
+   <footer class="py-8 text-center text-gray-500 border-t border-gray-200">
+     <p class="font-bold text-gray-600">ห้องเรียนวิทยาศาสตร์ชีววิทยา</p>
+     <p class="text-sm">จัดทำโดยระบบอัตโนมัติเพื่อประสิทธิภาพการเรียนรู้</p>
+   </footer>
+  </div>
+
+  <div id="attendance-modal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-backdrop absolute inset-0" onclick="closeModal('attendance')"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+      <form id="attendance-form" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg pointer-events-auto overflow-hidden">
+        <div class="bg-emerald-600 p-6 text-white font-bold text-2xl flex items-center gap-2">✅ เช็คชื่อเข้าเรียน</div>
+        <div class="p-8 space-y-5">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-gray-900 mb-2">ห้องเรียน</label>
+              <select id="att-room" onchange="updateStudentList('att')" required class="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="">เลือกห้อง</option>
+                <option value="5/1">ม.5/1</option>
+                <option value="5/2">ม.5/2</option>
+                <option value="5/3">ม.5/3</option>
+                <option value="5/7">ม.5/7</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-900 mb-2">เลขที่</label>
+              <input type="number" id="att-no" required min="1" class="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500" placeholder="ระบุเลขที่">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-900 mb-2">ชื่อ-นามสกุล</label>
+            <select id="att-name" required class="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="">เลือกห้องเรียนก่อน...</option>
+            </select>
+          </div>
+          <div class="flex gap-4 pt-4">
+            <button type="button" onclick="closeModal('attendance')" class="flex-1 py-4 border border-gray-300 rounded-2xl font-bold text-gray-700">ยกเลิก</button>
+            <button type="submit" class="flex-1 py-4 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700">บันทึก</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="assignment-modal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-backdrop absolute inset-0" onclick="closeModal('assignment')"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+      <form id="assignment-form" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg pointer-events-auto overflow-hidden">
+        <div class="bg-blue-600 p-6 text-white font-bold text-2xl flex items-center gap-2">📝 ส่งงาน</div>
+        <div class="p-8 space-y-5">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-gray-900 mb-2">ห้อง</label>
+              <select id="asg-room" onchange="updateStudentList('asg')" required class="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">เลือกห้อง</option>
+                <option value="5/1">ม.5/1</option>
+                <option value="5/2">ม.5/2</option>
+                <option value="5/3">ม.5/3</option>
+                <option value="5/7">ม.5/7</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-900 mb-2">เลขที่</label>
+              <input type="number" id="asg-no" required min="1" class="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="ระบุเลขที่">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-900 mb-2">ชื่อ-นามสกุล</label>
+            <select id="asg-name" required class="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">เลือกห้องเรียนก่อน...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-900 mb-2">ชื่องาน</label>
+            <input type="text" id="asg-title" required class="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="เช่น การแบ่งเซลล์เมฆ">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-900 mb-2">แนบรูปภาพงาน</label>
+            <input type="file" id="asg-image" accept="image/*" required class="w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+          </div>
+          <div class="flex gap-4 pt-4">
+            <button type="button" onclick="closeModal('assignment')" class="flex-1 py-4 border border-gray-300 rounded-2xl font-bold text-gray-700">ยกเลิก</button>
+            <button type="submit" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700">ส่งงาน</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ข้อมูลนักเรียนทั้งหมด (เรียงตามลำดับที่ให้มา)
+    const studentData = {
+      "5/1": ["นายศิริภัสร์ ปลื้มมล", "นายกรวิชญ์ จันทร์เติบ", "นายสรวิชญ์ รุ่งเรือง", "นายอภิชาติ ชินเสน", "นายธนกฤต ถาวร", "นายธนกร สุขวัฒน์", "นายพรปวีณ์ โคตะสา", "นายกันตภณ กาพย์กลอน", "นายธนวัตน์ หมั้นสิงห์", "นายธนาวัฒน์ ชูรัตน์", "นายรชานนท์ ประสารวรณ์", "นายวัชรพล จันพวง", "นายสงกรานต์ บุญคำ", "นายอดิศักดิ์ หาวัน", "นางสาวธนัชชา แก้วบัวเคน", "นางสาวสุพิชญา นามคุณ", "นางสาวอารยา แท่นทอง", "นางสาวกมลชนก โสมศรี", "นางสาวกัลย์สุดา หงษ์ตระกูล", "นางสาวจิรายุ โคตรพงษ์", "นางสาวนารีรัตน์ มากดี", "นางสาวข้าวขวัญ จำปามูล", "นางสาวธัญญ์ฐิตา ภูววงศ์ชัยสิน", "นางสาวเบญจวรรณ ผิวก่ำ", "นางสาวปุณณมาส คำคูณ", "นางสาวสิริกร วงศ์สุวรรณ์", "นางสาวนภสร ม่วงทอง", "นางสาวพรนภา โคตรพรม", "นางสาวพอเพียง ปทุมรัตน์", "นางสาวพิศชรัตน์ บัวใหญ่", "นางสาวมุกมณี สุพล", "นางสาววริศรา สะพล", "นางสาววาสนา จารุแพทย์", "นางสาวสิริภา วิชัยศรี", "นางสาวศุภกานต์ นุวงษ์"],
+      "5/2": ["นายจักรกฤษ์ จำปีทูล", "นายชัยนคร กันยาบัตร", "นายเทพทัต สัมพันธ์เพ็ง", "นายธีระเดช ประมูลศิลป์", "นายวุฒิชัย เสียงไพเราะ", "นายณัฐสิทธ อุ่นชัย", "นายชนะชัย มีวงษ์", "นายศตวรรษ เข็มรถ", "นายอมร สิมพันธ์", "นายปุญญพัฒน์ สร้างพล", "นางสาวศยามล ดีโลนงาม", "นางสาวสุพัตรา พัฒนะพันธ์", "นางสาวพรนภา กันภัย", "นางสาวพรไพลิน เข็มคุณ", "นางสาวศิริกาญจน์ พันขอ", "นางสาวปัทมา สลักลาย", "นางสาวสโรชา สีทากูล", "นางสาวบุญญารักษ์ โคตวัน", "นางสาวพรรวษา พันธ์ครู", "นางสาวพิชญาภา ลาพรมมา", "นางสาวบุญขวัญ ทองเหลือง", "นางสาวภัทรศรี งอนไถ", "นางสาวลลิษา มานุพันธ์", "นางสาวรวิกานต์ รงค์โยธิน", "นางสาวจันทร์ธิมา สารีอาจ", "นางสาวณภัทร เกตุศักดิ์", "นางสาวปทิตตา พรมสิงห์", "นางสาวปริตา บุราไกร", "นางสาวพิชชาพร ทางทอง", "นางสาวรุ่งทิวา ผาสุขทรง", "นางสาววัชราภรณ์ ศรีสอน", "นางสาวอภัสรา สายยืน", "นางสาวธนัญชนก ชูติพงศ์"],
+      "5/3": ["นายปวริศว์ ทองทศ", "นายภูชิต เมืองอินทร์", "นายอนุชา จันทร์ปอภาร", "นายอนุทัต ทาคำห่อ", "นายณัฐพล พวงบุตร", "นายธวัฒชัย หอมหีน", "นายจิรายุ พันธ์งาม", "นายยศกร ทองเหลือง", "นายอนาวิล บุญครอง", "นางสาวกัลย์สุดา สารีมูล", "นางสาวโชติกา ประทุมมา", "นางสาวเบญจมาภรณ์ ไชยมูล", "นางสาวพรนภา ดาวประสงค์", "นางสาววรรณิดา พิมพ์พัฒน์", "นางสาวสุพรรณวดี กุลอุปฮาด", "นางสาวจินตพร ราตรี", "นางสาววราภรณ์ บุญอาสา", "นางสาวฉัตรมณี มีทอง", "นางสาวสุธิดา เพ็ชรลิน", "นางสาวกฤติยาณี หล้าบุตร", "นางสาวชื่นฤดี ศรียะลา", "นางสาวเบญจพร พิมพ์วงศ์", "นางสาวเบญจรัตน์ กาญจนรักษ์", "นางสาวปุณยพร ศิริเทพ", "นางสาวสุชัญญา หาญละคร", "นางสาวสุธาสินี สายแสง", "นางสาวอนุชิตา วงษ์ชมภู", "นางสาวอภิชญา ดอกแก้ว", "นางสาวอินทิวร ประทุมเวียง", "นางสาวปรัศนีย์ อินปาน", "นางสาวสุภาพร บังศรี"],
+      "5/7": ["นายพีระพัฒน์ ไชยสวัสดิ์", "นายกตัญญู บุคะจำปา", "นายภัทรดนัย พิมพ์สาร", "นายศตคุณ วรจิตร", "นายจักรภัทร จันทาโสม", "นายธนดล พันธ์ครู", "นางสาวขวัญนภา พรมดวง", "นางสาวชุติกาญจน์ ส่งเสริม", "นางสาวนภัสทาภรณ์ มูละชาติ", "นางสาวสุรางคณา จันอาจ", "นางสาวน้ำเพชร พิรัมย์", "นางสาวสุพิชชา บุญบำเรอ", "นางสาวกนกวรรณ มณีวงค์", "นางสาวกาญจนาวดี พินธุรักษ์", "นางสาวชมพูนุช ทาคำสุข", "นางสาวฐานะดี โกศล", "นางสาวณิชกานต์ นิลจำรัส", "นางสาวนลินญา จันทาโสม", "นางสาวนุชวรา นิ่มน้อย", "นางสาวประภัสสร กิจวัฒนาวิวัฒน์", "นางสาวสุทธิดา มูลสุวรรณ", "นางสาวสุวรรณหงส์ นาสุข"]
+    };
+
+    let allRecords = [];
+
+    // เริ่มต้น SDK
+    if (window.dataSdk) {
+      window.dataSdk.init({
+        onDataChanged: (data) => {
+          allRecords = data;
+          renderRecords();
+        }
+      });
+    }
+
+    function openModal(id) { document.getElementById(`${id}-modal`).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(`${id}-modal`).classList.add('hidden'); document.getElementById(`${id}-form`).reset(); }
+
+    // อัปเดตรายชื่อใน Dropdown ตามห้องที่เลือก
+    function updateStudentList(prefix) {
+      const room = document.getElementById(`${prefix}-room`).value;
+      const nameSelect = document.getElementById(`${prefix}-name`);
+      nameSelect.innerHTML = '<option value="">เลือกชื่อนักเรียน...</option>';
+      if (room && studentData[room]) {
+        studentData[room].forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          nameSelect.appendChild(opt);
+        });
+      }
+    }
+
+    // จัดการบันทึกเข้า Data SDK
+    document.getElementById('attendance-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const record = {
+        type: 'attendance',
+        room: document.getElementById('att-room').value,
+        no: document.getElementById('att-no').value,
+        name: document.getElementById('att-name').value,
+        timestamp: new Date().toISOString()
+      };
+      await window.dataSdk.create(record);
+      closeModal('attendance');
+    };
+
+    document.getElementById('assignment-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const file = document.getElementById('asg-image').files[0];
+      let imageData = '';
+      if (file) {
+        imageData = await new Promise(res => {
+          const reader = new FileReader();
+          reader.onload = (ev) => res(ev.target.result);
+          reader.readAsDataURL(file);
+        });
+      }
+      const record = {
+        type: 'assignment',
+        room: document.getElementById('asg-room').value,
+        no: document.getElementById('asg-no').value,
+        name: document.getElementById('asg-name').value,
+        title: document.getElementById('asg-title').value,
+        image: imageData,
+        timestamp: new Date().toISOString()
+      };
+      await window.dataSdk.create(record);
+      closeModal('assignment');
+    };
+
+    // แสดงผลข้อมูลในหน้าเว็บ (Backend View)
+    function renderRecords() {
+      const container = document.getElementById('records-container');
+      const roomFilter = document.getElementById('filter-room').value;
+      const typeFilter = document.getElementById('filter-type').value;
+
+      let filtered = allRecords.filter(r => {
+        const matchRoom = roomFilter === 'all' || r.room === roomFilter;
+        const matchType = typeFilter === 'all' || r.type === typeFilter;
+        return matchRoom && matchType;
+      });
+
+      // เรียงตามเวลาล่าสุด
+      filtered.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="p-12 text-center text-gray-400">ยังไม่พบข้อมูลการบันทึก</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(r => {
+        const date = new Date(r.timestamp);
+        const dateStr = date.toLocaleDateString('th-TH', {day:'numeric', month:'short'});
+        const timeStr = date.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
+        const isAtt = r.type === 'attendance';
+
+        return `
+          <div class="border-b border-gray-100 p-5 flex flex-col md:flex-row gap-4 items-start md:items-center hover:bg-gray-50 transition-colors">
+            <div class="flex-shrink-0 w-14 text-center">
+              <p class="text-xs font-bold text-gray-400 uppercase">${dateStr}</p>
+              <p class="text-lg font-bold text-gray-900">${timeStr}</p>
+            </div>
+            <div class="flex-shrink-0">
+              <span class="px-3 py-1 rounded-lg text-xs font-bold ${isAtt ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}">
+                ${isAtt ? 'มาเรียน' : 'ส่งงาน'}
+              </span>
+            </div>
+            <div class="flex-grow">
+              <p class="text-lg font-bold text-gray-900">${r.name}</p>
+              <p class="text-sm text-gray-500 font-medium">ม.${r.room} เลขที่ ${r.no} ${!isAtt ? `• งาน: ${r.title}` : ''}</p>
+              ${r.image ? `<img src="${r.image}" class="mt-3 w-48 h-32 object-cover rounded-xl border border-gray-200 shadow-sm">` : ''}
+            </div>
+            <button onclick="deleteRec('${r.__backendId}')" class="text-red-400 hover:text-red-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deleteRec(id) {
+      if (confirm('ยืนยันการลบข้อมูลนี้?')) {
+        const item = allRecords.find(r => r.__backendId === id);
+        if (item) await window.dataSdk.delete(item);
+      }
+    }
+  </script>
+ </body>
+</html>
